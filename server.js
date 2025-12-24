@@ -162,6 +162,53 @@ app.get('/api/users', protect, async (req, res) => {
     }
 });
 
+
+// ================================
+// DELETE PLAYER
+// DELETE /api/users/:id
+// ================================
+app.delete('/api/users/:id', protect, async (req, res) => {
+    try {
+        const player = await Player.findById(req.params.id);
+       
+
+        if (!player) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        await player.deleteOne();
+        res.status(200).json({ message: 'Player deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error deleting player' });
+    }
+});
+
+
+// ================================
+// UPDATE PLAYER (PAID / DETAILS)
+// PATCH /api/users/:id
+// ================================
+app.patch('/api/users/:id', protect, async (req, res) => {
+    try {
+        const updatedPlayer = await Player.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedPlayer) {
+            return res.status(404).json({ message: 'Player not found' });
+        }
+
+        res.status(200).json(updatedPlayer);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error updating player' });
+    }
+});
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
